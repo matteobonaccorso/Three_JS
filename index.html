@@ -1,33 +1,58 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Multiple object detection using pre trained model in TensorFlow.js</title>
+        <title>Multiple object detection in AR enviroment</title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 
         <!-- Import TensorFlow.js library -->
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js" type="text/javascript"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
         <!-- Load the coco-ssd model to use to recognize things in images -->
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+        <!-- THREE -->
+        <script type="text/javascript" src="https://unpkg.com/three@0.126.0/build/three.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/three@0.126.0/examples/js/loaders/GLTFLoader.js"></script>
 
         <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-         <h1>Multiple object detection using pre trained model in TensorFlow.js</h1>
+        <h1>Multiple object detection using pre trained model in TensorFlow.js</h1>
 
         <p>Wait for the model to load before clicking the button to enable the webcam - at which point it will become visible to use.</p>
             
         <section id="demos" class="invisible">
         
-            <p>Hold some objects up close to your webcam to get a real-time classification! When ready click "enable webcam" 
-                below and accept access to the webcam when the browser asks (check the top left of your window)</p>
+            <p>Hold some objects up close to your webcam to get a real-time classification!</p>
               
             <div id="liveView" class="camView">
-                <button id="webcamButton">Enable Webcam</button>
-                <video id="webcam" autoplay muted width="640" height="480"></video>
+                <button id="webcamButton" onclick="activateXR()">Start!</button>
             </div>
         </section>
-        <script src="js/imageDetection.js"></script>
+
+        <script type="text/javascript" src="js/interactive/HTMLMesh.js"></script>
+        <script type="text/javascript" src="js/interactive/InteractiveGroup.js"></script>
+        <script type="text/javascript" src="js/imageDetection.js"></script>
+        <script type="text/javascript" src="js/AR.js"></script>
+
+        <!-- javascript set up logic -->
+        <script type="text/javascript">
+            const demosSection = document.getElementById('demos');
+
+            // Store the resulting model in the global scope of our app.
+            var model = undefined;
+
+            // Before we can use COCO-SSD class we must wait for it to finish
+            // loading. Machine Learning models can be large and take a moment 
+            // to get everything needed to run.
+            // Note: cocoSsd is an external object loaded from our index.html
+            // script tag import so ignore any warning in Glitch.
+            cocoSsd.load().then(function (loadedModel) {
+                model = loadedModel;
+                // Show demo section now model is ready to use.
+                demosSection.classList.remove('invisible');
+            });
+        </script>
     </body>
 </html>
