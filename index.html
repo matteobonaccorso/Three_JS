@@ -1,126 +1,33 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html>
+    <head>
+        <title>Multiple object detection using pre trained model in TensorFlow.js</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>WebXR</title>
-</head>
+        <!-- Import TensorFlow.js library -->
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js" type="text/javascript"></script>
+        <!-- Load the coco-ssd model to use to recognize things in images -->
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
 
-<body>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+         <h1>Multiple object detection using pre trained model in TensorFlow.js</h1>
 
-  <!-- Starting an immersive WebXR session requires user interaction.
-    We start this one with a simple button. -->
-  <button onclick="activateXR()">Start Hello WebXR</button>
-
-  <script type="text/javascript" src="js/three.js"></script>
-  <script type="text/javascript" src="js/HTMLMesh.js"></script>
-  <script type="text/javascript" src="js/IteractiveGroup.js"></script>
-  <script type="text/javascript" src="js/GLTFLoader.js"></script>
-
-  <script>
-    async function activateXR() {
-      // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
-      const canvas = document.createElement("canvas");
-      document.body.appendChild(canvas);
-      const gl = canvas.getContext("webgl", { xrCompatible: true });
-
-      const scene = new THREE.Scene();
-
-      const light = new THREE.AmbientLight(0xeeeeee);
-      scene.add(light);
-
-      // Set up the WebGLRenderer, which handles rendering to the session's base layer.
-      const renderer = new THREE.WebGLRenderer({
-        alpha: true,
-        preserveDrawingBuffer: true,
-        canvas: canvas,
-        context: gl
-      });
-      renderer.autoClear = false;
-
-      // The API directly updates the camera matrices.
-      // Disable matrix auto updates so three.js doesn't attempt
-      // to handle the matrices independently.
-      const camera = new THREE.PerspectiveCamera();
-      camera.matrixAutoUpdate = false;
-
-      // Initialize a WebXR session using "immersive-ar".
-      const session = await navigator.xr.requestSession("immersive-ar", { requiredFeatures: ['hit-test'] });
-      session.updateRenderState({
-        baseLayer: new XRWebGLLayer(session, gl)
-      });
-
-      // A 'local' reference space has a native origin that is located
-      // near the viewer's position at the time the session was created.
-      const referenceSpace = await session.requestReferenceSpace('local');
-
-      // Create another XRReferenceSpace that has the viewer as the origin.
-      const viewerSpace = await session.requestReferenceSpace('viewer');
-      // Perform hit testing using the viewer as origin.
-      const hitTestSource = await session.requestHitTestSource({ space: viewerSpace });
-
-      const loader = new THREE.GLTFLoader();
-      let reticle;
-      loader.load("https://immersive-web.github.io/webxr-samples/media/gltf/reticle/reticle.gltf", function (gltf) {
-        reticle = gltf.scene;
-        reticle.visible = false;
-        scene.add(reticle);
-      })
-
-      let flower;
-      loader.load("https://immersive-web.github.io/webxr-samples/media/gltf/sunflower/sunflower.gltf", function (gltf) {
-        flower = gltf.scene;
-      });
-
-      session.addEventListener("select", (event) => {
-        if (flower) {
-          const clone = flower.clone();
-          clone.position.copy(reticle.position);
-          scene.add(clone);
-        }
-      })
-
-      // Create a render loop that allows us to draw on the AR view.
-      const onXRFrame = (time, frame) => {
-        // Queue up the next draw request.
-        session.requestAnimationFrame(onXRFrame);
-
-        // Bind the graphics framebuffer to the baseLayer's framebuffer
-        gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)
-
-        // Retrieve the pose of the device.
-        // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
-        const pose = frame.getViewerPose(referenceSpace);
-        if (pose) {
-          // In mobile AR, we only have one view.
-          const view = pose.views[0];
-
-          const viewport = session.renderState.baseLayer.getViewport(view);
-          renderer.setSize(viewport.width, viewport.height)
-
-          // Use the view's transform matrix and projection matrix to configure the THREE.camera.
-          camera.matrix.fromArray(view.transform.matrix)
-          camera.projectionMatrix.fromArray(view.projectionMatrix);
-          camera.updateMatrixWorld(true);
-
-          const hitTestResults = frame.getHitTestResults(hitTestSource);
-          if (hitTestResults.length > 0 && reticle) {
-            const hitPose = hitTestResults[0].getPose(referenceSpace);
-            reticle.visible = true;
-            reticle.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z)
-            reticle.updateMatrixWorld(true);
-          }
-
-          // Render the scene with THREE.WebGLRenderer.
-          renderer.render(scene, camera)
-        }
-      }
-      session.requestAnimationFrame(onXRFrame);
-    }
-  </script>
-</body>
-
+        <p>Wait for the model to load before clicking the button to enable the webcam - at which point it will become visible to use.</p>
+            
+        <section id="demos" class="invisible">
+        
+            <p>Hold some objects up close to your webcam to get a real-time classification! When ready click "enable webcam" 
+                below and accept access to the webcam when the browser asks (check the top left of your window)</p>
+              
+            <div id="liveView" class="camView">
+                <button id="webcamButton">Enable Webcam</button>
+                <video id="webcam" autoplay muted width="640" height="480"></video>
+            </div>
+        </section>
+        <script src="js/imageDetection.js"></script>
+    </body>
 </html>
