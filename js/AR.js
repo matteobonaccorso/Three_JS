@@ -56,7 +56,7 @@ async function activateXR() {
       const group = new THREE.InteractiveGroup(renderer, camera);
       scene.add(group);
 
-      const squares = detectImages(canvas);
+      detectImages(canvas);
 
       for(uiContent of squares){
         let object = new THREE.HTMLMesh(uiContent);

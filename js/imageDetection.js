@@ -5,22 +5,13 @@ function getUserMediaSupported() {
     return !!(navigator.mediaDevices &&
       navigator.mediaDevices.getUserMedia);
 }
-  
-// If webcam supported, add event listener to button for when user
-// wants to activate it to call enableCam function which we will 
-// define in the next step.
-/*if (getUserMediaSupported()) {
-    enableWebcamButton.addEventListener('click', enableCam);
-} else {
-    console.warn('getUserMedia() is not supported by your browser');
-}*/
 
 function detectImages(source) {
   // Now let's start classifying a frame in the stream.
-  const squares = model.detect(source).then(function (predictions) {
-    // Store the highlighting square
-    let children = [];
-    
+  model.detect(source).then(function (predictions) {
+
+    squares.splice(0);
+
     // Now lets loop through predictions and draw them to the live view if
     // they have a high confidence score.
     for (let n = 0; n < predictions.length; n++) {
@@ -43,36 +34,10 @@ function detectImages(source) {
 
         // document.body.appendChild(highlighter);
         // document.body.appendChild(p);
-        children.push(highlighter);
-        children.push(p);
+        squares.push(highlighter);
+        squares.push(p);
       } 
-    }
-
-    return children;
-    
+    }  
   });
-
-  return squares;
 }
-  
-// Placeholder function for next step. Paste over this in the next step.
-/*function enableCam(event) {
-     // Only continue if the COCO-SSD has finished loading.
-  if (!model) {
-    return;
-  }
-  
-  // Hide the button once clicked.
-  event.target.classList.add('removed');  
-  
-  // getUsermedia parameters to force video but not audio.
-  const constraints = {
-    video: true
-  };
 
-  // Activate the webcam stream.
-  navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-    video.srcObject = stream;
-    video.addEventListener('loadeddata', predictWebcam);
-  });
-}*/
