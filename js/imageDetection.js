@@ -10,6 +10,10 @@ function detectImages(source) {
   // Now let's start classifying a frame in the stream.
   model.detect(source).then(function (predictions) {
 
+    for(o of squares){
+      document.body.removeChild(o);
+    }
+    
     squares.splice(0);
 
     // Now lets loop through predictions and draw them to the live view if
@@ -32,8 +36,8 @@ function detectImages(source) {
             + predictions[n].bbox[2] + 'px; height: '
             + predictions[n].bbox[3] + 'px;';
 
-        // document.body.appendChild(highlighter);
-        // document.body.appendChild(p);
+        document.body.appendChild(highlighter);
+        document.body.appendChild(p);
         squares.push(highlighter);
         squares.push(p);
       } 

@@ -38,7 +38,7 @@ async function activateXR() {
     // Create another XRReferenceSpace that has the viewer as the origin.
     const viewerSpace = await session.requestReferenceSpace('viewer');
     // Perform hit testing using the viewer as origin.
-    // const hitTestSource = await session.requestHitTestSource({ space: viewerSpace });
+    const hitTestSource = await session.requestHitTestSource({ space: viewerSpace });
 
     /*session.addEventListener("select", (event) => {
       if (flower) {
@@ -54,16 +54,8 @@ async function activateXR() {
       session.requestAnimationFrame(onXRFrame);
 
       const group = new THREE.InteractiveGroup(renderer, camera);
-      scene.add(group);
 
       detectImages(canvas);
-
-      for(uiContent of squares){
-        let object = new THREE.HTMLMesh(uiContent);
-        object.scale.setScalar(2);
-
-        group.add(object);
-      }
 
       // Bind the graphics framebuffer to the baseLayer's framebuffer
       gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)
@@ -83,6 +75,20 @@ async function activateXR() {
         camera.projectionMatrix.fromArray(view.projectionMatrix);
         camera.updateMatrixWorld(true);
 
+        const hitTestResults = frame.getHitTestResults(hitTestSource);
+        if (hitTestResults.length > 0) {
+
+            const hitPose = hitTestResults[0].getPose(referenceSpace);
+
+            for(uiContent of squares){
+                let object = new THREE.HTMLMesh(uiContent);
+                object.scale.setScalar(2);
+                object.position.set(uiContent.style.left,uiContent.style.top, hitPose.transform.position.z);
+                group.add(object);
+                scene.add(object);
+                scene.add(group);
+            }
+        }
         // Render the scene with THREE.WebGLRenderer.
         renderer.render(scene, camera)
       }
