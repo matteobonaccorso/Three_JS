@@ -55,7 +55,7 @@ async function activateXR() {
 
       const group = new THREE.InteractiveGroup(renderer, camera);
 
-      detectImages(canvas);
+      detectImages(video);
 
       // Bind the graphics framebuffer to the baseLayer's framebuffer
       gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)

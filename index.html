@@ -31,6 +31,8 @@
             </div>
         </section>
 
+        <video id="webcam" autoplay muted style="display: none;"></video>
+
         <script type="text/javascript" src="js/interactive/HTMLMesh.js"></script>
         <script type="text/javascript" src="js/interactive/InteractiveGroup.js"></script>
         <script type="text/javascript" src="js/imageDetection.js"></script>
@@ -39,7 +41,16 @@
         <!-- javascript set up logic -->
         <script type="text/javascript">
             const demosSection = document.getElementById('demos');
+            const video = document.getElementById('webcam');
 
+            // getUsermedia parameters to force video but not audio.
+            const constraints = {
+                video: true
+            };
+            navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
+                video.src = stream;
+            });
+            
             // Store the resulting model in the global scope of our app.
             var model = undefined;
 
